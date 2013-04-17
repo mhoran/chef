@@ -26,8 +26,6 @@ require 'uuidtools'
 class Chef
   class ResourceReporter < EventDispatch::Base
 
-
-
     class ResourceReport < Struct.new(:new_resource,
                                       :current_resource,
                                       :action,
@@ -69,7 +67,6 @@ class Chef
         as_hash["cookbook_name"] = new_resource.cookbook_name
         as_hash["cookbook_version"] = new_resource.cookbook_version.version
         as_hash
-
       end
 
       def finish
@@ -79,13 +76,16 @@ class Chef
       def success?
         !self.exception
       end
-    end
+
+    end # End class ResouceReport
 
     attr_reader :updated_resources
     attr_reader :status
     attr_reader :exception
     attr_reader :run_id
     attr_reader :error_descriptions
+
+    PROTOCOL_VERSION = '0.1.0'
 
     def initialize(rest_client)
       if Chef::Config[:enable_reporting] && !Chef::Config[:why_run]

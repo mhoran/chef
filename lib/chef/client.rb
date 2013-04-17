@@ -352,7 +352,8 @@ class Chef
         @events.registration_completed
       end
       # We now have the client key, and should use it from now on.
-      @rest = Chef::REST.new(config[:chef_server_url], client_name, config[:client_key])
+      options  =  {:headers => {'X-Ops-Reporting-Protocol-Version' => Chef::ResourceReporter::PROTOCOL_VERSION}}
+      @rest = Chef::REST.new(config[:chef_server_url], client_name, config[:client_key], options)
       @resource_reporter = Chef::ResourceReporter.new(@rest)
       @events.register(@resource_reporter)
     rescue Exception => e
