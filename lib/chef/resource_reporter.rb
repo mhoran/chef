@@ -107,10 +107,18 @@ class Chef
 
     def node_load_completed(node, expanded_run_list_with_versions, config)
       @node = node
+    end
+
+    def start_time
+      @run_status.start_time
+    end
+
+    def run_started(run_status)
+      @run_status = run_status
       if reporting_enabled?
         begin
-          resource_history_url = "reports/nodes/#{node.name}/runs"
-          server_response = @rest_client.post_rest(resource_history_url, {:action => :begin})
+          resource_history_url = "reports/nodes/#{@node.name}/runs"
+          server_response = @rest_client.post_rest(resource_history_url, {"action" => "begin", "start_time" => start_time.to_s})
           run_uri = URI.parse(server_response["uri"])
           @run_id = ::File.basename(run_uri.path)
           Chef::Log.info("Chef server generated run history id: #{@run_id}")
@@ -212,6 +220,10 @@ class Chef
         Chef::Log.debug("Server doesn't support resource history, skipping resource report.")
       end
     end
+
+    def end_time
+      @run_status.end_time
+    end
     
     def prepare_run_data
       run_data = {}
@@ -223,6 +235,7 @@ class Chef
       run_data["run_list"] = @node.run_list.to_json
       run_data["total_res_count"] = @total_res_count.to_s
       run_data["data"] = {}
+      run_data["end_time"] = end_time.to_s
 
       if exception
         exception_data = {}
